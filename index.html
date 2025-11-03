@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Google LATAM - Versión Simple</title>
+    <title>Dashboard Completo Google LATAM</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
@@ -20,7 +20,7 @@
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -30,7 +30,7 @@
         
         h1 {
             color: #2d3748;
-            font-size: 32px;
+            font-size: 36px;
             margin-bottom: 10px;
             text-align: center;
         }
@@ -42,9 +42,48 @@
             font-size: 16px;
         }
         
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            color: #718096;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+            background: #f7fafc;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
         }
@@ -63,13 +102,13 @@
         }
         
         .kpi-label {
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0.9;
             margin-bottom: 8px;
         }
         
         .kpi-value {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
         }
         
@@ -111,6 +150,7 @@
             cursor: pointer;
             outline: none;
             transition: all 0.3s;
+            margin: 0 5px;
         }
         
         select:hover {
@@ -149,6 +189,39 @@
             font-size: 16px;
         }
         
+        .data-table {
+            width: 100%;
+            margin-top: 30px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        
+        .data-table tr:hover {
+            background: #f7fafc;
+        }
+        
         canvas {
             max-width: 100%;
             height: auto !important;
@@ -162,75 +235,217 @@
             h1 {
                 font-size: 24px;
             }
+            
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>📊 Dashboard Empoderando Google LATAM</h1>
-        <p class="subtitle">Análisis de Inversión, Tecnología y Sostenibilidad en América Latina</p>
+        <p class="subtitle">Análisis Integral: Inversión, Startups, Educación Digital y Empleo en América Latina</p>
         
-        <div class="filter-section">
-            <label for="countryFilter" style="margin-right: 10px; font-weight: 600; color: #2d3748;">🌎 Filtrar por país:</label>
-            <select id="countryFilter" onchange="updateDashboard()">
-                <option value="Todos">Todos los países</option>
-                <option value="EEUU">Estados Unidos</option>
-                <option value="COLOMBIA">Colombia</option>
-                <option value="PERU">Perú</option>
-                <option value="BOLIVIA">Bolivia</option>
-            </select>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab(0)">🏢 Proyectos de Construcción</button>
+            <button class="tab" onclick="switchTab(1)">📈 Evolución Histórica 2020-2024</button>
+            <button class="tab" onclick="switchTab(2)">🚀 Ecosistema de Startups</button>
+            <button class="tab" onclick="switchTab(3)">📊 Comparativa General</button>
         </div>
-        
-        <div class="kpi-grid" id="kpiGrid"></div>
-        
-        <div class="chart-grid">
-            <div class="chart-container">
-                <div class="chart-title">💰 Inversión Total por País</div>
-                <canvas id="inversionChart"></canvas>
+
+        <!-- TAB 1: Proyectos de Construcción -->
+        <div id="tab0" class="tab-content active">
+            <div class="filter-section">
+                <label style="margin-right: 10px; font-weight: 600; color: #2d3748;">🌎 Filtrar por país:</label>
+                <select id="countryFilter1" onchange="updateTab1()">
+                    <option value="Todos">Todos los países</option>
+                    <option value="EEUU">Estados Unidos</option>
+                    <option value="COLOMBIA">Colombia</option>
+                    <option value="PERU">Perú</option>
+                    <option value="BOLIVIA">Bolivia</option>
+                </select>
             </div>
             
-            <div class="chart-container">
-                <div class="chart-title">👥 Empleos Generados</div>
-                <canvas id="empleosChart"></canvas>
+            <div class="kpi-grid" id="kpiGrid1"></div>
+            
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <div class="chart-title">💰 Inversión en Construcción por País</div>
+                    <canvas id="chart1_1"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">👥 Empleos Generados</div>
+                    <canvas id="chart1_2"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">🎯 Indicadores de Rendimiento</div>
+                    <canvas id="chart1_3"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">📊 Tecnología vs Rentabilidad</div>
+                    <canvas id="chart1_4"></canvas>
+                </div>
             </div>
             
-            <div class="chart-container">
-                <div class="chart-title">📊 Comparación de Indicadores</div>
-                <canvas id="radarChart"></canvas>
+            <div class="data-table">
+                <h3 style="padding: 20px; background: #f7fafc; font-size: 18px; color: #2d3748;">📋 Detalle de Proyectos</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>País</th>
+                            <th>Inversión (USD)</th>
+                            <th>Tecnología (%)</th>
+                            <th>Rentabilidad (%)</th>
+                            <th>Sostenibilidad (%)</th>
+                            <th>Empleos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table1"></tbody>
+                </table>
             </div>
             
-            <div class="chart-container">
-                <div class="chart-title">📈 Tecnología vs Rentabilidad</div>
-                <canvas id="lineChart"></canvas>
+            <div class="insights">
+                <h3>💡 Insights - Proyectos de Construcción</h3>
+                <div class="insight-grid" id="insights1"></div>
             </div>
         </div>
-        
-        <div class="insights">
-            <h3>💡 Insights Principales</h3>
-            <div class="insight-grid">
-                <div class="insight-item">
-                    <strong>🏆 Líder en Inversión</strong>
-                    <span>EEUU con $12,000 millones invertidos en 3 proyectos</span>
+
+        <!-- TAB 2: Evolución Histórica -->
+        <div id="tab1" class="tab-content">
+            <div class="filter-section">
+                <label style="margin-right: 10px; font-weight: 600; color: #2d3748;">🌎 Seleccionar país:</label>
+                <select id="countryFilter2" onchange="updateTab2()">
+                    <option value="Brasil">Brasil</option>
+                    <option value="México">México</option>
+                    <option value="Colombia">Colombia</option>
+                    <option value="Chile">Chile</option>
+                    <option value="Perú">Perú</option>
+                    <option value="Argentina">Argentina</option>
+                </select>
+            </div>
+            
+            <div class="kpi-grid" id="kpiGrid2"></div>
+            
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <div class="chart-title">📈 Evolución de Startups Registradas</div>
+                    <canvas id="chart2_1"></canvas>
                 </div>
-                <div class="insight-item">
-                    <strong>🚀 Mayor Adopción Tecnológica</strong>
-                    <span>Perú lidera con 75% en implementación tecnológica</span>
+                <div class="chart-container">
+                    <div class="chart-title">💰 Evolución de Inversión (Millones USD)</div>
+                    <canvas id="chart2_2"></canvas>
                 </div>
-                <div class="insight-item">
-                    <strong>💼 Impacto Laboral</strong>
-                    <span>34,500 empleos directos e indirectos generados en total</span>
+                <div class="chart-container">
+                    <div class="chart-title">🌐 Acceso a Internet y Educación Digital</div>
+                    <canvas id="chart2_3"></canvas>
                 </div>
-                <div class="insight-item">
-                    <strong>🌱 Sostenibilidad</strong>
-                    <span>EEUU y Perú destacan con 82% en índice de sostenibilidad</span>
+                <div class="chart-container">
+                    <div class="chart-title">👥 Empleos Generados 2020-2024</div>
+                    <canvas id="chart2_4"></canvas>
                 </div>
+                <div class="chart-container">
+                    <div class="chart-title">📉 Reducción de Brecha Tecnológica</div>
+                    <canvas id="chart2_5"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">👩‍💼 Participación Femenina (%)</div>
+                    <canvas id="chart2_6"></canvas>
+                </div>
+            </div>
+            
+            <div class="insights">
+                <h3>💡 Insights - Evolución Histórica</h3>
+                <div class="insight-grid" id="insights2"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Ecosistema de Startups -->
+        <div id="tab2" class="tab-content">
+            <div class="kpi-grid" id="kpiGrid3"></div>
+            
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <div class="chart-title">🚀 Número de Startups por País</div>
+                    <canvas id="chart3_1"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">📊 Tasa de Desempleo Juvenil (%)</div>
+                    <canvas id="chart3_2"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">🌱 Emprendimientos Digitales con Misión Social</div>
+                    <canvas id="chart3_3"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">📊 Comparación: Startups vs Desempleo</div>
+                    <canvas id="chart3_4"></canvas>
+                </div>
+            </div>
+            
+            <div class="data-table">
+                <h3 style="padding: 20px; background: #f7fafc; font-size: 18px; color: #2d3748;">📋 Datos por País</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>País</th>
+                            <th>N° Startups</th>
+                            <th>Desempleo Juvenil</th>
+                            <th>Emprendimientos Sociales</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table3"></tbody>
+                </table>
+            </div>
+            
+            <div class="insights">
+                <h3>💡 Insights - Ecosistema de Startups</h3>
+                <div class="insight-grid" id="insights3"></div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Comparativa General -->
+        <div id="tab3" class="tab-content">
+            <div class="filter-section">
+                <label style="margin-right: 10px; font-weight: 600; color: #2d3748;">📅 Año:</label>
+                <select id="yearFilter" onchange="updateTab4()">
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                </select>
+            </div>
+            
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <div class="chart-title">🌎 Ranking de Inversión por País</div>
+                    <canvas id="chart4_1"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">🚀 Ranking de Startups</div>
+                    <canvas id="chart4_2"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">👥 Empleos Generados Total</div>
+                    <canvas id="chart4_3"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">🎯 Índice de Madurez Digital</div>
+                    <canvas id="chart4_4"></canvas>
+                </div>
+            </div>
+            
+            <div class="insights">
+                <h3>💡 Insights - Comparativa Regional</h3>
+                <div class="insight-grid" id="insights4"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Datos
-        const rawData = [
+        // DATOS
+        const data1 = [
             { pais: 'EEUU', inversion: 9000, tecnologia: 44, rentabilidad: 73, sostenibilidad: 82, empleos: 18000 },
             { pais: 'EEUU', inversion: 2000, tecnologia: 32, rentabilidad: 55, sostenibilidad: 70, empleos: 4000 },
             { pais: 'EEUU', inversion: 1000, tecnologia: 58, rentabilidad: 32, sostenibilidad: 65, empleos: 1500 },
@@ -239,185 +454,555 @@
             { pais: 'BOLIVIA', inversion: 1, tecnologia: 30, rentabilidad: 40, sostenibilidad: 55, empleos: 1000 }
         ];
 
+        const data2 = [
+            { pais: 'Brasil', ano: 2020, startups: 9800, inversion: 6100, acceso_internet: 79, educacion: 64, brecha: 18, empleos: 210000, femenina: 32 },
+            { pais: 'Brasil', ano: 2021, startups: 11200, inversion: 7200, acceso_internet: 81, educacion: 67, brecha: 16, empleos: 236000, femenina: 34 },
+            { pais: 'Brasil', ano: 2022, startups: 12500, inversion: 8800, acceso_internet: 83, educacion: 70, brecha: 14, empleos: 258000, femenina: 35 },
+            { pais: 'Brasil', ano: 2023, startups: 13700, inversion: 9400, acceso_internet: 84, educacion: 71, brecha: 12, empleos: 271000, femenina: 36 },
+            { pais: 'Brasil', ano: 2024, startups: 14100, inversion: 9700, acceso_internet: 85, educacion: 73, brecha: 11, empleos: 280000, femenina: 37 },
+            { pais: 'México', ano: 2020, startups: 6200, inversion: 4000, acceso_internet: 74, educacion: 59, brecha: 23, empleos: 140000, femenina: 29 },
+            { pais: 'México', ano: 2021, startups: 7200, inversion: 4800, acceso_internet: 76, educacion: 61, brecha: 21, empleos: 156000, femenina: 30 },
+            { pais: 'México', ano: 2022, startups: 8100, inversion: 5600, acceso_internet: 78, educacion: 65, brecha: 18, empleos: 169000, femenina: 31 },
+            { pais: 'México', ano: 2023, startups: 8700, inversion: 6100, acceso_internet: 79, educacion: 68, brecha: 15, empleos: 181000, femenina: 32 },
+            { pais: 'México', ano: 2024, startups: 9100, inversion: 6700, acceso_internet: 81, educacion: 70, brecha: 14, empleos: 190000, femenina: 33 },
+            { pais: 'Colombia', ano: 2020, startups: 3200, inversion: 1500, acceso_internet: 65, educacion: 52, brecha: 28, empleos: 69000, femenina: 27 },
+            { pais: 'Colombia', ano: 2021, startups: 3800, inversion: 1700, acceso_internet: 67, educacion: 55, brecha: 25, empleos: 74000, femenina: 28 },
+            { pais: 'Colombia', ano: 2022, startups: 4600, inversion: 2100, acceso_internet: 69, educacion: 57, brecha: 23, empleos: 79000, femenina: 29 },
+            { pais: 'Colombia', ano: 2023, startups: 5400, inversion: 2500, acceso_internet: 70, educacion: 60, brecha: 21, empleos: 87000, femenina: 30 },
+            { pais: 'Colombia', ano: 2024, startups: 5800, inversion: 2900, acceso_internet: 72, educacion: 63, brecha: 19, empleos: 94000, femenina: 31 },
+            { pais: 'Chile', ano: 2020, startups: 3500, inversion: 2200, acceso_internet: 77, educacion: 60, brecha: 20, empleos: 85000, femenina: 31 },
+            { pais: 'Chile', ano: 2021, startups: 4000, inversion: 2500, acceso_internet: 79, educacion: 63, brecha: 18, empleos: 92000, femenina: 32 },
+            { pais: 'Chile', ano: 2022, startups: 4300, inversion: 2900, acceso_internet: 80, educacion: 65, brecha: 17, empleos: 99000, femenina: 33 },
+            { pais: 'Chile', ano: 2023, startups: 4600, inversion: 3200, acceso_internet: 82, educacion: 69, brecha: 14, empleos: 104000, femenina: 34 },
+            { pais: 'Chile', ano: 2024, startups: 4900, inversion: 3500, acceso_internet: 83, educacion: 72, brecha: 13, empleos: 110000, femenina: 35 },
+            { pais: 'Perú', ano: 2020, startups: 1800, inversion: 900, acceso_internet: 61, educacion: 47, brecha: 33, empleos: 36000, femenina: 25 },
+            { pais: 'Perú', ano: 2021, startups: 2200, inversion: 1100, acceso_internet: 64, educacion: 50, brecha: 30, empleos: 41000, femenina: 26 },
+            { pais: 'Perú', ano: 2022, startups: 2600, inversion: 1300, acceso_internet: 66, educacion: 53, brecha: 27, empleos: 46000, femenina: 27 },
+            { pais: 'Perú', ano: 2023, startups: 3100, inversion: 1400, acceso_internet: 68, educacion: 58, brecha: 25, empleos: 52000, femenina: 28 },
+            { pais: 'Perú', ano: 2024, startups: 3500, inversion: 1600, acceso_internet: 70, educacion: 61, brecha: 23, empleos: 58000, femenina: 29 },
+            { pais: 'Argentina', ano: 2020, startups: 4900, inversion: 2400, acceso_internet: 72, educacion: 55, brecha: 25, empleos: 108000, femenina: 28 },
+            { pais: 'Argentina', ano: 2021, startups: 5400, inversion: 2700, acceso_internet: 73, educacion: 58, brecha: 23, empleos: 114000, femenina: 29 },
+            { pais: 'Argentina', ano: 2022, startups: 5800, inversion: 2900, acceso_internet: 75, educacion: 60, brecha: 20, empleos: 121000, femenina: 30 },
+            { pais: 'Argentina', ano: 2023, startups: 6200, inversion: 3100, acceso_internet: 76, educacion: 63, brecha: 17, empleos: 129000, femenina: 31 },
+            { pais: 'Argentina', ano: 2024, startups: 6600, inversion: 3400, acceso_internet: 78, educacion: 66, brecha: 16, empleos: 135000, femenina: 32 }
+        ];
+
+        const data3 = [
+            { pais: 'Colombia', startups: 1501, desempleo: 19.4, emprendimientos_sociales: '8-12%' },
+            { pais: 'México', startups: 1083, desempleo: 5.9, emprendimientos_sociales: '6-10%' },
+            { pais: 'Brasil', startups: 2962, desempleo: 15.3, emprendimientos_sociales: '5-9%' },
+            { pais: 'Argentina', startups: 708, desempleo: 5.0, emprendimientos_sociales: '7-10%' },
+            { pais: 'Chile', startups: 563, desempleo: 22.0, emprendimientos_sociales: '8-12%' },
+            { pais: 'Perú', startups: 151, desempleo: 8.8, emprendimientos_sociales: '6-9%' },
+            { pais: 'Ecuador', startups: 51, desempleo: 7.8, emprendimientos_sociales: '5-8%' },
+            { pais: 'Bolivia', startups: 0, desempleo: 20.25, emprendimientos_sociales: '4-7%' }
+        ];
+
         let charts = {};
 
-        function getFilteredData() {
-            const filter = document.getElementById('countryFilter').value;
-            return filter === 'Todos' ? rawData : rawData.filter(d => d.pais === filter);
-        }
-
-        function updateKPIs() {
-            const data = getFilteredData();
-            const totalInversion = data.reduce((sum, d) => sum + d.inversion, 0);
-            const totalEmpleos = data.reduce((sum, d) => sum + d.empleos, 0);
-            const avgRentabilidad = (data.reduce((sum, d) => sum + d.rentabilidad, 0) / data.length).toFixed(1);
-            const avgSostenibilidad = (data.reduce((sum, d) => sum + d.sostenibilidad, 0) / data.length).toFixed(1);
-            const avgTecnologia = (data.reduce((sum, d) => sum + d.tecnologia, 0) / data.length).toFixed(1);
-
-            const kpiGrid = document.getElementById('kpiGrid');
-            kpiGrid.innerHTML = `
-                <div class="kpi-card">
-                    <div class="kpi-label">💰 Inversión Total</div>
-                    <div class="kpi-value">$${totalInversion.toLocaleString()}M</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-label">👥 Empleos Generados</div>
-                    <div class="kpi-value">${totalEmpleos.toLocaleString()}</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-label">📊 Rentabilidad Promedio</div>
-                    <div class="kpi-value">${avgRentabilidad}%</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-label">🌱 Sostenibilidad Promedio</div>
-                    <div class="kpi-value">${avgSostenibilidad}%</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-label">🖥️ Tecnología Promedio</div>
-                    <div class="kpi-value">${avgTecnologia}%</div>
-                </div>
-            `;
-        }
-
-        function getDataByCountry() {
-            const result = {};
-            rawData.forEach(item => {
-                if (!result[item.pais]) {
-                    result[item.pais] = { inversion: 0, empleos: 0 };
-                }
-                result[item.pais].inversion += item.inversion;
-                result[item.pais].empleos += item.empleos;
+        function switchTab(index) {
+            document.querySelectorAll('.tab').forEach((tab, i) => {
+                tab.classList.toggle('active', i === index);
             });
-            return result;
+            document.querySelectorAll('.tab-content').forEach((content, i) => {
+                content.classList.toggle('active', i === index);
+            });
+            
+            if (index === 0) updateTab1();
+            else if (index === 1) updateTab2();
+            else if (index === 2) updateTab3();
+            else if (index === 3) updateTab4();
         }
 
-        function createCharts() {
-            const dataByCountry = getDataByCountry();
-            const paises = Object.keys(dataByCountry);
-
-            // Gráfico de Inversión
-            if (charts.inversion) charts.inversion.destroy();
-            charts.inversion = new Chart(document.getElementById('inversionChart'), {
+        // TAB 1: Proyectos de Construcción
+        function updateTab1() {
+            const filter = document.getElementById('countryFilter1').value;
+            const filtered = filter === 'Todos' ? data1 : data1.filter(d => d.pais === filter);
+            
+            const totalInv = filtered.reduce((s, d) => s + d.inversion, 0);
+            const totalEmp = filtered.reduce((s, d) => s + d.empleos, 0);
+            const avgTec = (filtered.reduce((s, d) => s + d.tecnologia, 0) / filtered.length).toFixed(1);
+            const avgRent = (filtered.reduce((s, d) => s + d.rentabilidad, 0) / filtered.length).toFixed(1);
+            const avgSost = (filtered.reduce((s, d) => s + d.sostenibilidad, 0) / filtered.length).toFixed(1);
+            
+            document.getElementById('kpiGrid1').innerHTML = `
+                <div class="kpi-card"><div class="kpi-label">💰 Inversión Total</div><div class="kpi-value">$${totalInv.toLocaleString()}M</div></div>
+                <div class="kpi-card"><div class="kpi-label">👥 Empleos</div><div class="kpi-value">${totalEmp.toLocaleString()}</div></div>
+                <div class="kpi-card"><div class="kpi-label">🖥️ Tecnología</div><div class="kpi-value">${avgTec}%</div></div>
+                <div class="kpi-card"><div class="kpi-label">📊 Rentabilidad</div><div class="kpi-value">${avgRent}%</div></div>
+                <div class="kpi-card"><div class="kpi-label">🌱 Sostenibilidad</div><div class="kpi-value">${avgSost}%</div></div>
+            `;
+            
+            const byCountry = {};
+            data1.forEach(d => {
+                if (!byCountry[d.pais]) byCountry[d.pais] = { inv: 0, emp: 0, tec: 0, rent: 0, sost: 0, count: 0 };
+                byCountry[d.pais].inv += d.inversion;
+                byCountry[d.pais].emp += d.empleos;
+                byCountry[d.pais].tec += d.tecnologia;
+                byCountry[d.pais].rent += d.rentabilidad;
+                byCountry[d.pais].sost += d.sostenibilidad;
+                byCountry[d.pais].count++;
+            });
+            const paises = Object.keys(byCountry);
+            
+            destroyChart('chart1_1');
+            charts.chart1_1 = new Chart(document.getElementById('chart1_1'), {
                 type: 'bar',
                 data: {
                     labels: paises,
                     datasets: [{
                         label: 'Inversión (Millones USD)',
-                        data: paises.map(p => dataByCountry[p].inversion),
-                        backgroundColor: ['#4285F4', '#EA4335', '#FBBC04', '#34A853']
+                        data: paises.map(p => byCountry[p].inv),
+                        backgroundColor: '#4285F4'
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: true }
             });
-
-            // Gráfico de Empleos
-            if (charts.empleos) charts.empleos.destroy();
-            charts.empleos = new Chart(document.getElementById('empleosChart'), {
+            
+            destroyChart('chart1_2');
+            charts.chart1_2 = new Chart(document.getElementById('chart1_2'), {
                 type: 'bar',
                 data: {
                     labels: paises,
                     datasets: [{
-                        label: 'Empleos Generados',
-                        data: paises.map(p => dataByCountry[p].empleos),
-                        backgroundColor: ['#34A853', '#FBBC04', '#EA4335', '#4285F4']
+                        label: 'Empleos',
+                        data: paises.map(p => byCountry[p].emp),
+                        backgroundColor: '#34A853'
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: true }
             });
-
-            // Gráfico Radar
-            const radarData = {};
-            rawData.forEach(item => {
-                if (!radarData[item.pais]) {
-                    radarData[item.pais] = { tec: 0, rent: 0, sost: 0, count: 0 };
-                }
-                radarData[item.pais].tec += item.tecnologia;
-                radarData[item.pais].rent += item.rentabilidad;
-                radarData[item.pais].sost += item.sostenibilidad;
-                radarData[item.pais].count++;
-            });
-
-            if (charts.radar) charts.radar.destroy();
-            charts.radar = new Chart(document.getElementById('radarChart'), {
+            
+            destroyChart('chart1_3');
+            charts.chart1_3 = new Chart(document.getElementById('chart1_3'), {
                 type: 'radar',
                 data: {
                     labels: paises,
                     datasets: [
                         {
                             label: 'Tecnología',
-                            data: paises.map(p => (radarData[p].tec / radarData[p].count).toFixed(1)),
+                            data: paises.map(p => (byCountry[p].tec / byCountry[p].count).toFixed(1)),
                             borderColor: '#4285F4',
                             backgroundColor: 'rgba(66, 133, 244, 0.2)'
                         },
                         {
                             label: 'Rentabilidad',
-                            data: paises.map(p => (radarData[p].rent / radarData[p].count).toFixed(1)),
+                            data: paises.map(p => (byCountry[p].rent / byCountry[p].count).toFixed(1)),
                             borderColor: '#34A853',
                             backgroundColor: 'rgba(52, 168, 83, 0.2)'
                         },
                         {
                             label: 'Sostenibilidad',
-                            data: paises.map(p => (radarData[p].sost / radarData[p].count).toFixed(1)),
+                            data: paises.map(p => (byCountry[p].sost / byCountry[p].count).toFixed(1)),
                             borderColor: '#FBBC04',
                             backgroundColor: 'rgba(251, 188, 4, 0.2)'
                         }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true
-                }
+                options: { responsive: true, maintainAspectRatio: true }
             });
-
-            // Gráfico de Líneas
-            const filteredData = getFilteredData();
-            if (charts.line) charts.line.destroy();
-            charts.line = new Chart(document.getElementById('lineChart'), {
+            
+            destroyChart('chart1_4');
+            charts.chart1_4 = new Chart(document.getElementById('chart1_4'), {
                 type: 'line',
                 data: {
-                    labels: filteredData.map((d, i) => `${d.pais} ${i+1}`),
+                    labels: filtered.map((d, i) => `${d.pais}-P${i+1}`),
                     datasets: [
                         {
                             label: 'Tecnología %',
-                            data: filteredData.map(d => d.tecnologia),
+                            data: filtered.map(d => d.tecnologia),
                             borderColor: '#4285F4',
                             tension: 0.4
                         },
                         {
                             label: 'Rentabilidad %',
-                            data: filteredData.map(d => d.rentabilidad),
+                            data: filtered.map(d => d.rentabilidad),
                             borderColor: '#EA4335',
                             tension: 0.4
                         }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            document.getElementById('table1').innerHTML = filtered.map(d => `
+                <tr>
+                    <td><strong>${d.pais}</strong></td>
+                    <td>${d.inversion.toLocaleString()}M</td>
+                    <td>${d.tecnologia}%</td>
+                    <td>${d.rentabilidad}%</td>
+                    <td>${d.sostenibilidad}%</td>
+                    <td>${d.empleos.toLocaleString()}</td>
+                </tr>
+            `).join('');
+            
+            const liderInv = paises.reduce((a, b) => byCountry[a].inv > byCountry[b].inv ? a : b);
+            const liderEmp = paises.reduce((a, b) => byCountry[a].emp > byCountry[b].emp ? a : b);
+            
+            document.getElementById('insights1').innerHTML = `
+                <div class="insight-item"><strong>🏆 Líder en Inversión</strong><span>${liderInv} con ${byCountry[liderInv].inv.toLocaleString()}M</span></div>
+                <div class="insight-item"><strong>💼 Líder en Empleos</strong><span>${liderEmp} con ${byCountry[liderEmp].emp.toLocaleString()} empleos</span></div>
+                <div class="insight-item"><strong>🎯 Total Proyectos</strong><span>${data1.length} proyectos en ${paises.length} países</span></div>
+                <div class="insight-item"><strong>💰 Inversión Total</strong><span>${data1.reduce((s,d) => s + d.inversion, 0).toLocaleString()}M USD</span></div>
+            `;
+        }
+
+        // TAB 2: Evolución Histórica
+        function updateTab2() {
+            const pais = document.getElementById('countryFilter2').value;
+            const filtered = data2.filter(d => d.pais === pais);
+            
+            const latest = filtered[filtered.length - 1];
+            const crecimientoStartups = ((latest.startups - filtered[0].startups) / filtered[0].startups * 100).toFixed(1);
+            const crecimientoInv = ((latest.inversion - filtered[0].inversion) / filtered[0].inversion * 100).toFixed(1);
+            const reduccionBrecha = (filtered[0].brecha - latest.brecha).toFixed(1);
+            
+            document.getElementById('kpiGrid2').innerHTML = `
+                <div class="kpi-card"><div class="kpi-label">🚀 Startups 2024</div><div class="kpi-value">${latest.startups.toLocaleString()}</div></div>
+                <div class="kpi-card"><div class="kpi-label">💰 Inversión 2024</div><div class="kpi-value">${latest.inversion.toLocaleString()}M</div></div>
+                <div class="kpi-card"><div class="kpi-label">📈 Crecimiento Startups</div><div class="kpi-value">+${crecimientoStartups}%</div></div>
+                <div class="kpi-card"><div class="kpi-label">🌐 Acceso Internet</div><div class="kpi-value">${latest.acceso_internet}%</div></div>
+                <div class="kpi-card"><div class="kpi-label">📚 Educación Digital</div><div class="kpi-value">${latest.educacion}%</div></div>
+                <div class="kpi-card"><div class="kpi-label">📉 Reducción Brecha</div><div class="kpi-value">-${reduccionBrecha}%</div></div>
+            `;
+            
+            const years = filtered.map(d => d.ano);
+            
+            destroyChart('chart2_1');
+            charts.chart2_1 = new Chart(document.getElementById('chart2_1'), {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Startups Registradas',
+                        data: filtered.map(d => d.startups),
+                        borderColor: '#4285F4',
+                        backgroundColor: 'rgba(66, 133, 244, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            destroyChart('chart2_2');
+            charts.chart2_2 = new Chart(document.getElementById('chart2_2'), {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Inversión (Millones USD)',
+                        data: filtered.map(d => d.inversion),
+                        borderColor: '#34A853',
+                        backgroundColor: 'rgba(52, 168, 83, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            destroyChart('chart2_3');
+            charts.chart2_3 = new Chart(document.getElementById('chart2_3'), {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'Acceso Internet %',
+                            data: filtered.map(d => d.acceso_internet),
+                            borderColor: '#4285F4',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Educación Digital %',
+                            data: filtered.map(d => d.educacion),
+                            borderColor: '#EA4335',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            destroyChart('chart2_4');
+            charts.chart2_4 = new Chart(document.getElementById('chart2_4'), {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Empleos Generados',
+                        data: filtered.map(d => d.empleos),
+                        backgroundColor: '#FBBC04'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            destroyChart('chart2_5');
+            charts.chart2_5 = new Chart(document.getElementById('chart2_5'), {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Brecha Tecnológica %',
+                        data: filtered.map(d => d.brecha),
+                        borderColor: '#EA4335',
+                        backgroundColor: 'rgba(234, 67, 53, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: true,
+                    scales: { y: { reverse: true } }
                 }
             });
+            
+            destroyChart('chart2_6');
+            charts.chart2_6 = new Chart(document.getElementById('chart2_6'), {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Participación Femenina %',
+                        data: filtered.map(d => d.femenina),
+                        borderColor: '#F48FB1',
+                        backgroundColor: 'rgba(244, 143, 177, 0.2)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            document.getElementById('insights2').innerHTML = `
+                <div class="insight-item"><strong>📈 Crecimiento Total</strong><span>+${crecimientoStartups}% en startups desde 2020</span></div>
+                <div class="insight-item"><strong>💰 Inversión</strong><span>+${crecimientoInv}% incremento en inversión</span></div>
+                <div class="insight-item"><strong>🌐 Conectividad</strong><span>${latest.acceso_internet}% de acceso a internet en 2024</span></div>
+                <div class="insight-item"><strong>📉 Brecha Digital</strong><span>Reducción de ${reduccionBrecha} puntos porcentuales</span></div>
+                <div class="insight-item"><strong>👥 Impacto Laboral</strong><span>${latest.empleos.toLocaleString()} empleos en 2024</span></div>
+                <div class="insight-item"><strong>👩‍💼 Equidad</strong><span>${latest.femenina}% participación femenina</span></div>
+            `;
         }
 
-        function updateDashboard() {
-            updateKPIs();
-            createCharts();
+        // TAB 3: Ecosistema de Startups
+        function updateTab3() {
+            const totalStartups = data3.reduce((s, d) => s + d.startups, 0);
+            const avgDesempleo = (data3.reduce((s, d) => s + d.desempleo, 0) / data3.length).toFixed(1);
+            const maxStartups = Math.max(...data3.map(d => d.startups));
+            const paisMaxStartups = data3.find(d => d.startups === maxStartups).pais;
+            
+            document.getElementById('kpiGrid3').innerHTML = `
+                <div class="kpi-card"><div class="kpi-label">🚀 Total Startups</div><div class="kpi-value">${totalStartups.toLocaleString()}</div></div>
+                <div class="kpi-card"><div class="kpi-label">📊 Desempleo Juvenil Prom.</div><div class="kpi-value">${avgDesempleo}%</div></div>
+                <div class="kpi-card"><div class="kpi-label">🏆 Líder en Startups</div><div class="kpi-value">${paisMaxStartups}</div></div>
+                <div class="kpi-card"><div class="kpi-label">🌎 Países Analizados</div><div class="kpi-value">${data3.length}</div></div>
+            `;
+            
+            const paises = data3.map(d => d.pais);
+            
+            destroyChart('chart3_1');
+            charts.chart3_1 = new Chart(document.getElementById('chart3_1'), {
+                type: 'bar',
+                data: {
+                    labels: paises,
+                    datasets: [{
+                        label: 'Número de Startups',
+                        data: data3.map(d => d.startups),
+                        backgroundColor: ['#4285F4', '#EA4335', '#FBBC04', '#34A853', '#FF6D00', '#46BDC6', '#AB47BC', '#26A69A']
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: true,
+                    indexAxis: 'y'
+                }
+            });
+            
+            destroyChart('chart3_2');
+            charts.chart3_2 = new Chart(document.getElementById('chart3_2'), {
+                type: 'bar',
+                data: {
+                    labels: paises,
+                    datasets: [{
+                        label: 'Desempleo Juvenil %',
+                        data: data3.map(d => d.desempleo),
+                        backgroundColor: '#EA4335'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            destroyChart('chart3_3');
+            charts.chart3_3 = new Chart(document.getElementById('chart3_3'), {
+                type: 'bar',
+                data: {
+                    labels: paises,
+                    datasets: [{
+                        label: 'Emprendimientos Sociales (promedio %)',
+                        data: data3.map(d => {
+                            const range = d.emprendimientos_sociales.match(/\d+/g);
+                            return range ? (parseInt(range[0]) + parseInt(range[1])) / 2 : 0;
+                        }),
+                        backgroundColor: '#34A853'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            destroyChart('chart3_4');
+            charts.chart3_4 = new Chart(document.getElementById('chart3_4'), {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Países',
+                        data: data3.filter(d => d.startups > 0).map(d => ({
+                            x: d.desempleo,
+                            y: d.startups
+                        })),
+                        backgroundColor: '#4285F4'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Desempleo Juvenil %' } },
+                        y: { title: { display: true, text: 'Número de Startups' } }
+                    }
+                }
+            });
+            
+            document.getElementById('table3').innerHTML = data3.map(d => `
+                <tr>
+                    <td><strong>${d.pais}</strong></td>
+                    <td>${d.startups > 0 ? d.startups.toLocaleString() : 'N/A'}</td>
+                    <td>${d.desempleo}%</td>
+                    <td>${d.emprendimientos_sociales}</td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('insights3').innerHTML = `
+                <div class="insight-item"><strong>🏆 Líder Regional</strong><span>${paisMaxStartups} con ${maxStartups.toLocaleString()} startups</span></div>
+                <div class="insight-item"><strong>📊 Desempleo Juvenil</strong><span>Promedio regional de ${avgDesempleo}%</span></div>
+                <div class="insight-item"><strong>🌱 Impacto Social</strong><span>5-12% de startups con misión social</span></div>
+                <div class="insight-item"><strong>🌎 Ecosistema</strong><span>${totalStartups.toLocaleString()} startups totales en LATAM</span></div>
+            `;
         }
 
-        // Inicializar
+        // TAB 4: Comparativa General
+        function updateTab4() {
+            const year = parseInt(document.getElementById('yearFilter').value);
+            const filtered = data2.filter(d => d.ano === year);
+            
+            const paises = filtered.map(d => d.pais);
+            
+            destroyChart('chart4_1');
+            charts.chart4_1 = new Chart(document.getElementById('chart4_1'), {
+                type: 'bar',
+                data: {
+                    labels: paises,
+                    datasets: [{
+                        label: 'Inversión (Millones USD)',
+                        data: filtered.map(d => d.inversion),
+                        backgroundColor: '#4285F4'
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: true,
+                    indexAxis: 'y'
+                }
+            });
+            
+            destroyChart('chart4_2');
+            charts.chart4_2 = new Chart(document.getElementById('chart4_2'), {
+                type: 'bar',
+                data: {
+                    labels: paises,
+                    datasets: [{
+                        label: 'Startups Registradas',
+                        data: filtered.map(d => d.startups),
+                        backgroundColor: '#34A853'
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: true,
+                    indexAxis: 'y'
+                }
+            });
+            
+            destroyChart('chart4_3');
+            charts.chart4_3 = new Chart(document.getElementById('chart4_3'), {
+                type: 'bar',
+                data: {
+                    labels: paises,
+                    datasets: [{
+                        label: 'Empleos Generados',
+                        data: filtered.map(d => d.empleos),
+                        backgroundColor: '#FBBC04'
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: true,
+                    indexAxis: 'y'
+                }
+            });
+            
+            destroyChart('chart4_4');
+            charts.chart4_4 = new Chart(document.getElementById('chart4_4'), {
+                type: 'radar',
+                data: {
+                    labels: paises,
+                    datasets: [
+                        {
+                            label: 'Acceso Internet %',
+                            data: filtered.map(d => d.acceso_internet),
+                            borderColor: '#4285F4',
+                            backgroundColor: 'rgba(66, 133, 244, 0.2)'
+                        },
+                        {
+                            label: 'Educación Digital %',
+                            data: filtered.map(d => d.educacion),
+                            borderColor: '#34A853',
+                            backgroundColor: 'rgba(52, 168, 83, 0.2)'
+                        }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            const totalInv = filtered.reduce((s, d) => s + d.inversion, 0);
+            const totalStartups = filtered.reduce((s, d) => s + d.startups, 0);
+            const totalEmpleos = filtered.reduce((s, d) => s + d.empleos, 0);
+            const liderInv = filtered.reduce((a, b) => a.inversion > b.inversion ? a : b);
+            const liderStartups = filtered.reduce((a, b) => a.startups > b.startups ? a : b);
+            
+            document.getElementById('insights4').innerHTML = `
+                <div class="insight-item"><strong>💰 Inversión Total ${year}</strong><span>${totalInv.toLocaleString()}M USD en la región</span></div>
+                <div class="insight-item"><strong>🚀 Ecosistema</strong><span>${totalStartups.toLocaleString()} startups registradas</span></div>
+                <div class="insight-item"><strong>👥 Empleos</strong><span>${totalEmpleos.toLocaleString()} empleos generados</span></div>
+                <div class="insight-item"><strong>🏆 Líder en Inversión</strong><span>${liderInv.pais} con ${liderInv.inversion.toLocaleString()}M</span></div>
+                <div class="insight-item"><strong>🥇 Líder en Startups</strong><span>${liderStartups.pais} con ${liderStartups.startups.toLocaleString()} empresas</span></div>
+                <div class="insight-item"><strong>🌐 Conectividad</strong><span>Promedio ${(filtered.reduce((s,d) => s + d.acceso_internet, 0) / filtered.length).toFixed(1)}% acceso internet</span></div>
+            `;
+        }
+
+        function destroyChart(id) {
+            if (charts[id]) {
+                charts[id].destroy();
+                delete charts[id];
+            }
+        }
+
         window.onload = function() {
-            updateDashboard();
+            console.log('Dashboard cargando...');
+            updateTab1();
+            console.log('Dashboard listo!');
         };
     </script>
 </body>
