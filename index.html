@@ -3,17 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Google LATAM</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/recharts@2.5.0/dist/Recharts.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Dashboard Google LATAM - Versión Simple</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #2d3748;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .kpi-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .kpi-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .kpi-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        
+        .filter-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+        
+        select {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        select:hover {
+            border-color: #764ba2;
+        }
+        
+        .insights {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .insights h3 {
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+        
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .insight-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .insight-item strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+        
+        @media (max-width: 768px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
-        // AQUÍ PEGAS TODO EL CÓDIGO DEL COMPONENTE REACT DEL DASHBOARD
+    <div class="container">
+        <h1>📊 Dashboard Empoderando Google LATAM</h1>
+        <p class="subtitle">Análisis de Inversión, Tecnología y Sostenibilidad en América Latina</p>
+        
+        <div class="filter-section">
+            <label for="countryFilter" style="margin-right: 10px; font-weight: 600; color: #2d3748;">🌎 Filtrar por país:</label>
+            <select id="countryFilter" onchange="updateDashboard()">
+                <option value="Todos">Todos los países</option>
+                <option value="EEUU">Estados Unidos</option>
+                <option value="COLOMBIA">Colombia</option>
+                <option value="PERU">Perú</option>
+                <option value="BOLIVIA">Bolivia</option>
+            </select>
+        </div>
+        
+        <div class="kpi-grid" id="kpiGrid"></div>
+        
+        <div class="chart-grid">
+            <div class="chart-container">
+                <div class="chart-title">💰 Inversión Total por País</div>
+                <canvas id="inversionChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">👥 Empleos Generados</div>
+                <canvas id="empleosChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">📊 Comparación de Indicadores</div>
+                <canvas id="radarChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">📈 Tecnología vs Rentabilidad</div>
+                <canvas id="lineChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="insights">
+            <h3>💡 Insights Principales</h3>
+            <div class="insight-grid">
+                <div class="insight-item">
+                    <strong>🏆 Líder en Inversión</strong>
+                    <span>EEUU con $12,000 millones invertidos en 3 proyectos</span>
+                </div>
+                <div class="insight-item">
+                    <strong>🚀 Mayor Adopción Tecnológica</strong>
+                    <span>Perú lidera con 75% en implementación tecnológica</span>
+                </div>
+                <div class="insight-item">
+                    <strong>💼 Impacto Laboral</strong>
+                    <span>34,500 empleos directos e indirectos generados en total</span>
+                </div>
+                <div class="insight-item">
+                    <strong>🌱 Sostenibilidad</strong>
+                    <span>EEUU y Perú destacan con 82% en índice de sostenibilidad</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos
+        const rawData = [
+            { pais: 'EEUU', inversion: 9000, tecnologia: 44, rentabilidad: 73, sostenibilidad: 82, empleos: 18000 },
+            { pais: 'EEUU', inversion: 2000, tecnologia: 32, rentabilidad: 55, sostenibilidad: 70, empleos: 4000 },
+            { pais: 'EEUU', inversion: 1000, tecnologia: 58, rentabilidad: 32, sostenibilidad: 65, empleos: 1500 },
+            { pais: 'COLOMBIA', inversion: 1000, tecnologia: 65, rentabilidad: 72, sostenibilidad: 50, empleos: 2000 },
+            { pais: 'PERU', inversion: 6000, tecnologia: 75, rentabilidad: 66, sostenibilidad: 82, empleos: 9000 },
+            { pais: 'BOLIVIA', inversion: 1, tecnologia: 30, rentabilidad: 40, sostenibilidad: 55, empleos: 1000 }
+        ];
+
+        let charts = {};
+
+        function getFilteredData() {
+            const filter = document.getElementById('countryFilter').value;
+            return filter === 'Todos' ? rawData : rawData.filter(d => d.pais === filter);
+        }
+
+        function updateKPIs() {
+            const data = getFilteredData();
+            const totalInversion = data.reduce((sum, d) => sum + d.inversion, 0);
+            const totalEmpleos = data.reduce((sum, d) => sum + d.empleos, 0);
+            const avgRentabilidad = (data.reduce((sum, d) => sum + d.rentabilidad, 0) / data.length).toFixed(1);
+            const avgSostenibilidad = (data.reduce((sum, d) => sum + d.sostenibilidad, 0) / data.length).toFixed(1);
+            const avgTecnologia = (data.reduce((sum, d) => sum + d.tecnologia, 0) / data.length).toFixed(1);
+
+            const kpiGrid = document.getElementById('kpiGrid');
+            kpiGrid.innerHTML = `
+                <div class="kpi-card">
+                    <div class="kpi-label">💰 Inversión Total</div>
+                    <div class="kpi-value">$${totalInversion.toLocaleString()}M</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">👥 Empleos Generados</div>
+                    <div class="kpi-value">${totalEmpleos.toLocaleString()}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">📊 Rentabilidad Promedio</div>
+                    <div class="kpi-value">${avgRentabilidad}%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">🌱 Sostenibilidad Promedio</div>
+                    <div class="kpi-value">${avgSostenibilidad}%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">🖥️ Tecnología Promedio</div>
+                    <div class="kpi-value">${avgTecnologia}%</div>
+                </div>
+            `;
+        }
+
+        function getDataByCountry() {
+            const result = {};
+            rawData.forEach(item => {
+                if (!result[item.pais]) {
+                    result[item.pais] = { inversion: 0, empleos: 0 };
+                }
+                result[item.pais].inversion += item.inversion;
+                result[item.pais].empleos += item.empleos;
+            });
+            return result;
+        }
+
+        function createCharts() {
+            const dataByCountry = getDataByCountry();
+            const paises = Object.keys(dataByCountry);
+
+            // Gráfico de Inversión
+            if (charts.inversion) charts.inversion.destroy();
+            charts.inversion = new Chart(document.getElementById('inversionChart'), {
+                type: 'bar',
+                data: {
+                    labels: paises,
+                    datasets: [{
+                        label: 'Inversión (Millones USD)',
+                        data: paises.map(p => dataByCountry[p].inversion),
+                        backgroundColor: ['#4285F4', '#EA4335', '#FBBC04', '#34A853']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Gráfico de Empleos
+            if (charts.empleos) charts.empleos.destroy();
+            charts.empleos = new Chart(document.getElementById('empleosChart'), {
+                type: 'bar',
+                data: {
+                    labels: paises,
+                    datasets: [{
+                        label: 'Empleos Generados',
+                        data: paises.map(p => dataByCountry[p].empleos),
+                        backgroundColor: ['#34A853', '#FBBC04', '#EA4335', '#4285F4']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Gráfico Radar
+            const radarData = {};
+            rawData.forEach(item => {
+                if (!radarData[item.pais]) {
+                    radarData[item.pais] = { tec: 0, rent: 0, sost: 0, count: 0 };
+                }
+                radarData[item.pais].tec += item.tecnologia;
+                radarData[item.pais].rent += item.rentabilidad;
+                radarData[item.pais].sost += item.sostenibilidad;
+                radarData[item.pais].count++;
+            });
+
+            if (charts.radar) charts.radar.destroy();
+            charts.radar = new Chart(document.getElementById('radarChart'), {
+                type: 'radar',
+                data: {
+                    labels: paises,
+                    datasets: [
+                        {
+                            label: 'Tecnología',
+                            data: paises.map(p => (radarData[p].tec / radarData[p].count).toFixed(1)),
+                            borderColor: '#4285F4',
+                            backgroundColor: 'rgba(66, 133, 244, 0.2)'
+                        },
+                        {
+                            label: 'Rentabilidad',
+                            data: paises.map(p => (radarData[p].rent / radarData[p].count).toFixed(1)),
+                            borderColor: '#34A853',
+                            backgroundColor: 'rgba(52, 168, 83, 0.2)'
+                        },
+                        {
+                            label: 'Sostenibilidad',
+                            data: paises.map(p => (radarData[p].sost / radarData[p].count).toFixed(1)),
+                            borderColor: '#FBBC04',
+                            backgroundColor: 'rgba(251, 188, 4, 0.2)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+
+            // Gráfico de Líneas
+            const filteredData = getFilteredData();
+            if (charts.line) charts.line.destroy();
+            charts.line = new Chart(document.getElementById('lineChart'), {
+                type: 'line',
+                data: {
+                    labels: filteredData.map((d, i) => `${d.pais} ${i+1}`),
+                    datasets: [
+                        {
+                            label: 'Tecnología %',
+                            data: filteredData.map(d => d.tecnologia),
+                            borderColor: '#4285F4',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Rentabilidad %',
+                            data: filteredData.map(d => d.rentabilidad),
+                            borderColor: '#EA4335',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+        }
+
+        function updateDashboard() {
+            updateKPIs();
+            createCharts();
+        }
+
+        // Inicializar
+        window.onload = function() {
+            updateDashboard();
+        };
     </script>
 </body>
 </html>
